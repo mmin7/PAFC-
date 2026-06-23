@@ -2524,5 +2524,65 @@
   }
 
 </script>
+<div id="customToastContainer" style="position: fixed; bottom: 24px; right: 24px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; pointer-events: none;"></div>
+
+<script>
+(function() {
+  // 화면에 토스트 알림을 생성하고 띄우는 함수
+  function launchToast(message) {
+    var container = document.getElementById('customToastContainer');
+    if (!container) return;
+
+    var toast = document.createElement('div');
+    
+    // 시스템의 기존 디자인 톤(--radius, --shadow 등)에 맞춘 스타일링
+    toast.style.padding = '14px 24px';
+    toast.style.borderRadius = '12px';
+    toast.style.color = '#fff';
+    toast.style.fontSize = '0.88rem';
+    toast.style.fontWeight = '600';
+    toast.style.boxShadow = '0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.06)';
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(20px)';
+    toast.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+    toast.style.pointerEvents = 'auto';
+    toast.style.fontFamily = "'Noto Sans KR', sans-serif";
+
+    // 알림 메시지 내용에 포함된 아이콘이나 단어에 따라 배경색을 자동으로 변경
+    if (message.includes('✅') || message.includes('완료') || message.includes('성공')) {
+      toast.style.background = '#16a34a'; // --success 색상
+    } else if (message.includes('⚠️') || message.includes('경고') || message.includes('삭제')) {
+      toast.style.background = '#d97706'; // --warning 색상
+    } else if (message.includes('❌') || message.includes('실패') || message.includes('오류')) {
+      toast.style.background = '#dc2626'; // --danger 색상
+    } else {
+      toast.style.background = '#2563eb'; // --primary 프리셋 색상
+    }
+
+    toast.innerText = message;
+    container.appendChild(toast);
+
+    // 부드럽게 위로 올라오며 나타나는 애니메이션 효과
+    setTimeout(function() {
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateY(0)';
+    }, 10);
+
+    // 3초 동안 유지된 후 부드럽게 사라짐
+    setTimeout(function() {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(-20px)';
+      setTimeout(function() {
+        toast.remove();
+      }, 300);
+    }, 3000);
+  }
+
+  // 브라우저의 기본 alert 창을 커스텀 토스트 알림으로 안전하게 대체(오버라이드)
+  window.alert = function(msg) {
+    launchToast(msg);
+  };
+})();
+</script>
 </body>
 </html>
